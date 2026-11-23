@@ -1,11 +1,17 @@
+const CACHE_NAME = 'gym-tracker-v2';
+const ASSETS = ['./', './index.html', './manifest.json', './icon.png'];
+
 self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
-  return self.clients.claim();
+  e.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('fetch', (e) => {
-  // Дозволяє завантажувати додаток з мережі
+  e.respondWith(
+    caches.match(e.request).then((res) => res || fetch(e.request))
+  );
 });
