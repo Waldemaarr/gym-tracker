@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Tracker 💪</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Gym Tracker">
-    <link rel="manifest" href="manifest.json">
-    <title>Gym Tracker 💪</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -92,6 +93,8 @@
         const start = new Date();
         const end = new Date();
         end.setMonth(end.getMonth() + 1); // +1 місяць
+        end.setDate(end.getDate() - 1);   // мінус 1 день (останній включний день)
+        end.setHours(23, 59, 59, 999);    // дійсний до кінця цієї доби
 
         const subData = {
             startDate: formatDate(start),
@@ -137,17 +140,17 @@
             ${customMsg ? `<div style="margin-bottom:10px; color:#a6e3a1;"><b>${customMsg}</b></div>` : ""}
             <div>Статус: ${statusText}</div>
             <div>Початок: <span class="highlight">${data.startDate}</span></div>
-            <div>Дійсний до: <span class="highlight">${data.endDate}</span></div>
+            <div>Дійсний до: <span class="highlight">${data.endDate} (включно)</span></div>
             <div>Залишилось занять: <span class="highlight">${data.workoutsLeft} з 12</span></div>
         `;
     }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('Service Worker зареєстрований!'))
+            .catch((err) => console.log('Помилка SW:', err));
+    }
 </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('Service Worker зареєстрований!'))
-      .catch((err) => console.log('Помилка SW:', err));
-  }
-</script>
+
 </body>
 </html>
