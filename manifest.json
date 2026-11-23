@@ -1,7 +1,9 @@
 {
+  "id": "/gym-tracker/",
   "name": "Gym Tracker",
   "short_name": "Gym",
-  "start_url": "./index.html",
+  "start_url": "/gym-tracker/",
+  "scope": "/gym-tracker/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
@@ -9,7 +11,8 @@
     {
       "src": "./icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
