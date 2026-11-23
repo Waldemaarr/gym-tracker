@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Tracker 💪</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background-color: #1e1e24;
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+        h1 { margin-top: 0; font-size: 22px; color: #a6e3a1; }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-workout { background-color: #89b4fa; color: #11111b; }
+        .btn-renew { background-color: #a6e3a1; color: #11111b; }
+        .btn-info { background-color: #313244; color: #cdd6f4; }
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #181825;
+            border-radius: 12px;
+            border: 1px solid #45475a;
+            display: none;
+            text-align: left;
+            line-height: 1.6;
+        }
+        .highlight { color: #f9e2af; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🏋️‍♂️ Мій Абонемент</h1>
+    
+    <button class="btn btn-workout" onclick="doWorkout()">💪 Тренування (-1)</button>
+    <button class="btn btn-info" onclick="showInfo()">📊 Переглянути інформацію</button>
+    <button class="btn btn-renew" onclick="renewSub()">🔄 Оновити абонемент</button>
+
+    <div id="infoBox" class="info-box"></div>
+</div>
+
+<script>
+    function getData() {
+        const data = localStorage.getItem('gymSub');
+        return data ? JSON.parse(data) : null;
+    }
+
+    function saveData(data) {
+        localStorage.setItem('gymSub', JSON.stringify(data));
+    }
+
+    function formatDate(dateObj) {
+        return dateObj.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function renewSub() {
+        if (getData() && !confirm("Точно оновити абонемент? Старі дані зітруться.")) return;
+        
+        const start = new Date();
+        const end = new Date();
+        end.setMonth(end.getMonth() + 1); // +1 місяць
+
+        const subData = {
+            startDate: formatDate(start),
+            endDate: formatDate(end),
+            endTimestamp: end.getTime(),
+            workoutsLeft: 12
+        };
+
+        saveData(subData);
+        showInfo("✅ Абонемент успішно оновлено!");
+    }
+
+    function doWorkout() {
+        const data = getData();
+        if (!data) {
+            alert("Спочатку натисни 'Оновити абонемент'!");
+            return;
+        }
+        if (data.workoutsLeft <= 0) {
+            alert("Тренування вже закінчились! Час оновити абонемент.");
+            return;
+        }
+
+        data.workoutsLeft -= 1;
+        saveData(data);
+        showInfo("🔥 Тренування зараховано! Так тримати!");
+    }
+
+    function showInfo(customMsg = "") {
+        const box = document.getElementById('infoBox');
+        const data = getData();
+        box.style.display = 'block';
+
+        if (!data) {
+            box.innerHTML = "Абонемент ще не активовано. Натисни <b>«Оновити абонемент»</b>.";
+            return;
+        }
+
+        const isExpired = Date.now() > data.endTimestamp;
+        const statusText = isExpired ? "<span style='color:#f38ba8'>Протермінований!</span>" : "<span style='color:#a6e3a1'>Активний</span>";
+
+        box.innerHTML = `
+            ${customMsg ? `<div style="margin-bottom:10px; color:#a6e3a1;"><b>${customMsg}</b></div>` : ""}
+            <div>Статус: ${statusText}</div>
+            <div>Початок: <span class="highlight">${data.startDate}</span></div>
+            <div>Дійсний до: <span class="highlight">${data.endDate}</span></div>
+            <div>Залишилось занять: <span class="highlight">${data.workoutsLeft} з 12</span></div>
+        `;
+    }
+</script>
+
+</body>
+</html>
